@@ -27,6 +27,20 @@ them. Published titles are appended to `data/history.jsonl` so later runs don't 
 source .venv/bin/activate
 ```
 
+Without `setup.sh` (e.g. on Windows), install ffmpeg (`winget install ffmpeg`) and the DejaVu Sans
+font (captions use `DejaVuSans-Bold.ttf`), then:
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate    # On Windows: .venv\Scripts\activate
+pip install --upgrade pip setuptools wheel
+pip install torch --index-url https://download.pytorch.org/whl/cpu
+pip install -r requirements.txt
+```
+
+Install the CPU-only `torch` before `requirements.txt`; otherwise Whisper pulls in the multi-GB
+CUDA build and the later CPU install is skipped as already satisfied.
+
 Environment:
 
 | Variable | Required | Default |
