@@ -8,32 +8,36 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
 
+from ..config import CLIENT_SECRETS, DATA_DIR, YOUTUBE_TOKEN
 from .script_writer import Script
 
 SCOPES = ["https://www.googleapis.com/auth/youtube.upload"]
 CATEGORY_EDUCATION = "27"
 
 
-def authorize(client_secrets: Path, token_path: Path) -> None:
+def authorize() -> None:
     """One-time interactive OAuth consent; stores a refreshable token for unattended runs."""
-    flow = InstalledAppFlow.from_client_secrets_file(str(client_secrets), SCOPES)
+    if not CLIENT_SECRETS.exists():
+        raise SystemExit(f"missing {CLIENT_SECRETS}: download a Desktop-app OAuth client from Google Cloud Console")
+    flow = InstalledAppFlow.from_client_secrets_file(str(CLIENT_SECRETS), SCOPES)
     creds = flow.run_local_server(port=0)
-    token_path.write_text(creds.to_json())
+    DATA_DIR.mkdir(parents=True, exist_ok=True)
+    YOUTUBE_TOKEN.write_text(creds.to_json())
 
 
-def _credentials(token_path: Path) -> Credentials:
-    if not token_path.exists():
-        raise RuntimeError(f"no YouTube token at {token_path}; run `python main.py auth` first")
-    creds = Credentials.from_authorized_user_file(str(token_path), SCOPES)
+def _credentials() -> Credentials:
+    if not YOUTUBE_TOKEN.exists():
+        raise RuntimeError(f"no YouTube token at {YOUTUBE_TOKEN}; run `python main.py auth` first")
+    creds = Credentials.from_authorized_user_file(str(YOUTUBE_TOKEN), SCOPES)
     if not creds.valid:
         creds.refresh(Request())
-        token_path.write_text(creds.to_json())
+        YOUTUBE_TOKEN.write_text(creds.to_json())
     return creds
 
 
-def upload(video_path: Path, script: Script, privacy: str, token_path: Path) -> str:
+def upload(video_path: Path, script: Script, privacy: str) -> str:
     """Upload the video and return its YouTube video ID."""
-    youtube = build("youtube", "v3", credentials=_credentials(token_path))
+    youtube = build("youtube", "v3", credentials=_credentials())
     request = youtube.videos().insert(
         part="snippet,status",
         body={

@@ -109,7 +109,6 @@ def produce_short(settings: Settings, client: anthropic.Anthropic) -> Job:
             job.require("rendered video", job.video_path),
             job.require("script", job.script),
             settings.privacy,
-            settings.token_path,
         )
         return json.dumps({"video_id": job.video_id, "privacy": settings.privacy})
 

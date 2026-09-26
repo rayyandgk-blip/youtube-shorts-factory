@@ -7,6 +7,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 DATA_DIR = ROOT / "data"
 OUTPUT_DIR = ROOT / "output"
+CLIENT_SECRETS = DATA_DIR / "client_secrets.json"
+YOUTUBE_TOKEN = DATA_DIR / "youtube_token.json"
 
 MODEL = "claude-opus-5"
 # Server-side refusal fallback: the API routes a declined request to a suitable model.
@@ -24,8 +26,6 @@ class Settings:
     privacy: str
     voice: str
     pexels_api_key: str
-    client_secrets: Path
-    token_path: Path
 
     @classmethod
     def from_env(cls) -> "Settings":
@@ -35,6 +35,4 @@ class Settings:
             privacy=os.environ.get("YOUTUBE_PRIVACY", "private"),
             voice=os.environ.get("TTS_VOICE", "en-US-GuyNeural"),
             pexels_api_key=os.environ["PEXELS_API_KEY"],
-            client_secrets=DATA_DIR / "client_secrets.json",
-            token_path=DATA_DIR / "youtube_token.json",
         )

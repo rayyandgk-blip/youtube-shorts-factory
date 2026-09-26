@@ -13,7 +13,7 @@ import anthropic
 import schedule
 
 from factory.agents import uploader
-from factory.config import DATA_DIR, Settings
+from factory.config import Settings
 from factory.orchestrator import produce_short
 
 log = logging.getLogger("factory")
@@ -45,12 +45,11 @@ def main() -> None:
     args = parser.parse_args()
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
 
-    settings = Settings.from_env()
-    DATA_DIR.mkdir(parents=True, exist_ok=True)
     if args.command == "auth":
-        uploader.authorize(settings.client_secrets, settings.token_path)
+        uploader.authorize()
         return
 
+    settings = Settings.from_env()
     client = anthropic.Anthropic()
     if args.command == "once":
         run_once(settings, client)
