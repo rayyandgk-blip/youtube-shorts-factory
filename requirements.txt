@@ -1,0 +1,8 @@
+anthropic
+schedule
+requests
+moviepy==1.0.3
+openai-whisper
+edge-tts
+google-api-python-client
+google-auth-oauthlib
